@@ -77,7 +77,7 @@ void driveMotor(int pwmForward, int pwmReverse, int pinFwd, int pinRev) {
 }
 
 void setMotorSpeed(int motor, int speed) {
-  // Constrain speed to valid range
+  
   speed = constrain(speed, -255, 255);
   
   if (motor == 0) { // Right motor
@@ -111,20 +111,19 @@ void setup() {
   ledcAttach(RPWM_1, freq, resolution);
   ledcAttach(LPWM_1, freq, resolution);
 
-   // Motor enable pins
+  
   pinMode(REN, OUTPUT);
   pinMode(LEN, OUTPUT);
   pinMode(REN_1, OUTPUT);
   pinMode(LEN_1, OUTPUT);
 
-  // Enable motors
   digitalWrite(REN, HIGH);
   digitalWrite(LEN, HIGH);
   digitalWrite(REN_1, HIGH);
   digitalWrite(LEN_1, HIGH);
 
   pinMode(RELAY_PIN, OUTPUT);
-  digitalWrite(RELAY_PIN, LOW); // Weapon OFF initially
+  digitalWrite(RELAY_PIN, LOW); 
   
   Serial.println("FSi6 IBUS Receiver Initialized");
   Serial.println("Waiting for IBUS data...");
@@ -132,16 +131,16 @@ void setup() {
   delay(1000);
 }
 
-// ---------- Main Loop ----------
+
 void loop() {
-  // Read IBUS data from FSi6 receiver
+
   readIbus();
 
   displayChannels();
 
-  uint16_t ch1 = rcChannels[0]; // Steering (Roll)
-  uint16_t ch2 = rcChannels[2]; // Throttle 
-  uint16_t ch3 = rcChannels[4]; // Weapon switch (AUX1)
+  uint16_t ch1 = rcChannels[0];
+  uint16_t ch2 = rcChannels[2];  
+  uint16_t ch3 = rcChannels[4]; 
   
   if (ch1 < 800 || ch1 > 2200 || ch2 < 800 || ch2 > 2200) {
     setMotorSpeed(0, 0);
@@ -155,15 +154,15 @@ void loop() {
   int throttle = map(ch2, 1000, 2000, -255, 255);
   int steering = map(ch1, 1000, 2000, -255, 255);
 
-  // Calculate differential steering
+
   int leftMotor  = constrain(throttle + steering, -255, 255);
   int rightMotor = constrain(throttle - steering, -255, 255);
 
-  // Apply motor speeds
-  setMotorSpeed(0, rightMotor);  // Right motor
-  setMotorSpeed(1, leftMotor);   // Left motor
 
-  // Weapon control
+  setMotorSpeed(0, rightMotor);  
+  setMotorSpeed(1, leftMotor);  
+
+  
   if (ch3 > 1500) {
     digitalWrite(RELAY_PIN, LOW);
     // Serial.println("Weapon ON");
